@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import * as bcryptjs from 'bcryptjs'
+import * as jwt from 'jsonwebtoken'
+import * as dotenv from 'dotenv'
+import { Types } from 'mongoose';
+
+dotenv.config()
 
 @Injectable()
 export class UtilityService {
@@ -9,6 +14,24 @@ export class UtilityService {
             return { password: hashedPassword }
         }catch(err: any){
             throw err
+        }
+    }
+
+    async verifyPassword(userPassword: string, loginPassword: string): Promise<Boolean>{
+        if(!(await bcryptjs.compare(loginPassword, userPassword))){
+            return false
+        }
+        return true
+    }
+
+    async generateJWTToken(payload: { _id: Types.ObjectId, email: string }, expiresIn: string): Promise<{ token: string }> {
+        console.log(payload);
+        
+        try {
+            const token = jwt.sign(payload, process.env.SECRET_KEY as string, { expiresIn });
+            return { token };
+        } catch (err: any) {
+            throw new Error(`Failed to generate JWT: ${err.message}`);
         }
     }
 }

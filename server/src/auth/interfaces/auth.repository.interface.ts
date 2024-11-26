@@ -1,7 +1,7 @@
 import { AuthRegisterDTO } from "../dto/auth.register.dto";
-import { Users } from "../users.schema";
+import { Users, UsersDocument } from "../users.schema";
 
 export interface AuthRepositoryInterface {
-    findUserByEmail(userEmail: string): Promise<Users | null>
+    findUserByEmail(userEmail: string): Promise<UsersDocument>
     createUser(authRegisterDTO: Partial<AuthRegisterDTO>): Promise<Users>
 }

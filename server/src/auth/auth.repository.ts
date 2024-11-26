@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { AuthRepositoryInterface } from "./interfaces/auth.repository.interface";
-import { Users } from "./users.schema";
+import { Users, UsersDocument } from "./users.schema";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { AuthRegisterDTO } from "./dto/auth.register.dto";
@@ -9,7 +9,7 @@ import { AuthRegisterDTO } from "./dto/auth.register.dto";
 export class AuthRepository implements AuthRepositoryInterface {
     constructor(@InjectModel(Users.name) private readonly userModel: Model<Users>) {}
 
-    async findUserByEmail(userEmail: string): Promise<Users | null> {
+    async findUserByEmail(userEmail: string): Promise<UsersDocument> {
         return await this.userModel.findOne({ email: userEmail, role: 'organizer' })
     }
 

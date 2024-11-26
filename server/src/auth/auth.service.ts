@@ -3,6 +3,7 @@ import { AuthServiceInterface } from "./interfaces/auth.service.interface";
 import { AuthRegisterDTO } from "./dto/auth.register.dto";
 import { AuthRepositoryInterface } from "./interfaces/auth.repository.interface";
 import { UtilityService } from "../helpers/utility/utility.service";
+import { AuthLoginDTO } from "./dto/auth.login.dto";
 
 @Injectable()
 export class AuthService implements AuthServiceInterface {
@@ -26,5 +27,17 @@ export class AuthService implements AuthServiceInterface {
             throw new HttpException('Registration failed', HttpStatus.BAD_REQUEST);
         }
         return { message: 'Register Successfully' }
+    }
+
+    async handelUserLogin(authLoginDTO: AuthLoginDTO): Promise<{ message: string, token: string }> {
+        const user = await this.authRepository.findUserByEmail(authLoginDTO.email);
+        if(!user) throw new HttpException('Invalid login', HttpStatus.UNAUTHORIZED);
+        if(!(await this.utilService.verifyPassword(user.password, authLoginDTO.password)))  throw new HttpException('Invalid login', HttpStatus.UNAUTHORIZED);
+        const patload = {
+            _id: user._id,
+            email: user.email
+        }
+        const token = await this.utilService.generateJWTToken(patload, '20d');
+        return { message: 'Login Successfully', token:  token.token }
     }
 }
