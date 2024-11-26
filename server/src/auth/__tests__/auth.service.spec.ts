@@ -62,15 +62,12 @@ describe('AuthService', () => {
         })
 
         it('should successfully register a new user', async () => {
-            // Mock no existing user
             (mockAuthRepository.findUserByEmail as jest.Mock).mockResolvedValue(null);
 
-            // Mock password hashing
             (mockUtilityService.handelHashPassword as jest.Mock).mockResolvedValue({
                 password: 'hashedPassword'
             });
 
-            // Mock user creation
             (mockAuthRepository.createUser as jest.Mock).mockResolvedValue({
                 id: '1',
                 email: 'test@example.com'
@@ -78,7 +75,6 @@ describe('AuthService', () => {
 
             const result = await authService.handelUserRegister(mockRegisterDTO);
 
-            // Verify repository and utility service methods were called
             expect(mockAuthRepository.findUserByEmail).toHaveBeenCalledWith(mockRegisterDTO.email);
             expect(mockUtilityService.handelHashPassword).toHaveBeenCalledWith(mockRegisterDTO.password);
             expect(mockAuthRepository.createUser).toHaveBeenCalledWith(expect.objectContaining({
@@ -86,7 +82,6 @@ describe('AuthService', () => {
                 password: 'hashedPassword'
             }));
 
-            // Verify return value
             expect(result).toEqual({ message: 'Register Successfully' });
         });
     })
