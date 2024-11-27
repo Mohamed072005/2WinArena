@@ -3,6 +3,7 @@ import { AuthController } from "../auth.controller"
 import { AuthServiceInterface } from "../interfaces/auth.service.interface";
 import { AuthRegisterDTO } from "../dto/auth.register.dto";
 import { HttpException, HttpStatus } from "@nestjs/common";
+import { AuthLoginDTO } from "../dto/auth.login.dto";
 
 describe('AuthController', () => {
     let authController: AuthController;
@@ -10,7 +11,8 @@ describe('AuthController', () => {
 
     beforeEach(async () => {
         mockAuthService = {
-            handelUserRegister: jest.fn()
+            handelUserRegister: jest.fn(),
+            handelUserLogin: jest.fn()
         };
 
         const module: TestingModule = await Test.createTestingModule({
@@ -66,7 +68,7 @@ describe('AuthController', () => {
                 expect(error.getStatus()).toBe(HttpStatus.UNAUTHORIZED);
                 expect(error.getResponse()).toEqual({
                     statusCode: HttpStatus.UNAUTHORIZED,
-                    message: 'User already exists'
+                    error: 'User already exists'
                 });
             }
         })
@@ -79,6 +81,67 @@ describe('AuthController', () => {
 
             try {
                 await authController.register(mockRegisterDTO);
+            } catch (error) {
+                expect(error).toBeInstanceOf(HttpException);
+                expect(error.getStatus()).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+                expect(error.getResponse()).toEqual({
+                    statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+                    message: 'Server error'
+                });
+            }
+        });
+    })
+
+    describe('Login', () => {
+        const mockLoginDTO: AuthLoginDTO = {
+            email: 'test@example.com',
+            password: 'weldlhawat123'
+        }
+
+        it('should successfully login a user', async () => {
+            (mockAuthService.handelUserLogin as jest.Mock).mockResolvedValue({
+                message: 'Login Successfully',
+                token: 'JWT-TOKEN'
+            })
+
+            const response = await authController.login(mockLoginDTO);
+
+            expect(response).toEqual({
+                statusCode: HttpStatus.ACCEPTED,
+                message: 'Login Successfully',
+                token: 'JWT-TOKEN'
+            });
+
+            expect(mockAuthService.handelUserLogin).toHaveBeenCalledWith(mockLoginDTO);
+        })
+
+        it('should throw HttpException when login fails', async () => {
+            (mockAuthService.handelUserLogin as jest.Mock).mockRejectedValue({
+                status: HttpStatus.UNAUTHORIZED,
+                message: 'Invalid credentials'
+            });
+
+            await expect(authController.login(mockLoginDTO)).rejects.toThrow(HttpException);
+
+            try {
+                await authController.login(mockLoginDTO);
+            } catch (error) {
+                expect(error).toBeInstanceOf(HttpException);
+                expect(error.getStatus()).toBe(HttpStatus.UNAUTHORIZED);
+                expect(error.getResponse()).toEqual({
+                    statusCode: HttpStatus.UNAUTHORIZED,
+                    error: 'Invalid credentials'
+                });
+            }
+        })
+
+        it('should throw INTERNAL_SERVER_ERROR when no specific error is provided', async () => {
+            (mockAuthService.handelUserLogin as jest.Mock).mockRejectedValue(new Error('Unknown error'));
+
+            await expect(authController.login(mockLoginDTO)).rejects.toThrow(HttpException);
+
+            try {
+                await authController.login(mockLoginDTO);
             } catch (error) {
                 expect(error).toBeInstanceOf(HttpException);
                 expect(error.getStatus()).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
