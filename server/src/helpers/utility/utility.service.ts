@@ -24,9 +24,7 @@ export class UtilityService {
         return true
     }
 
-    async generateJWTToken(payload: { _id: Types.ObjectId, email: string }, expiresIn: string): Promise<{ token: string }> {
-        console.log(payload);
-        
+    async generateJWTToken(payload: { _id: Types.ObjectId, email: string }, expiresIn: string): Promise<{ token: string }> {        
         try {
             const token = jwt.sign(payload, process.env.SECRET_KEY as string, { expiresIn });
             return { token };

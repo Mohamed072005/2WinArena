@@ -18,11 +18,11 @@ export class AuthService implements AuthServiceInterface {
         }
         const hashedPassword = await this.utilService.handelHashPassword(authRegisterDTO.password);
         const userToCreate = {
-            ...AuthRegisterDTO,
+            ...authRegisterDTO,
             role: 'organizer',
             password: hashedPassword.password
         }
-        const registredUser = this.authRepository.createUser(userToCreate);
+        const registredUser = await this.authRepository.createUser(userToCreate);        
         if (!registredUser) {
             throw new HttpException('Registration failed', HttpStatus.BAD_REQUEST);
         }

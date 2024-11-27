@@ -1,10 +1,15 @@
-function App() {
+import { RouterProvider } from "react-router-dom"
+import { router } from "./router/router"
+import { Toaster } from 'react-hot-toast'
 
+function App() {
   return (
     <>
-      <h1 className='text-red-500 text-2xl'>
-        Hello
-      </h1>
+      <RouterProvider router={router} />
+      <Toaster
+                position="top-right"
+                reverseOrder={false}
+            />
     </>
   )
 }
