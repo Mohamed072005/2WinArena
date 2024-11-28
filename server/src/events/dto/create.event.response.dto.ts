@@ -1,6 +1,6 @@
 import { Event } from "../event.schema"
 
-export class CreateEventResponseDTO {
+export interface CreateEventResponseDTO {
     statusCode: number
     event: Event
     message: string

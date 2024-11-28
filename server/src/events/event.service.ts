@@ -13,7 +13,8 @@ export class EventService implements EventServiceInterface {
 
     async createEvent(createEventDTO: CreateEventDTO, origanizer: Types.ObjectId): Promise<Event> {
         const userEvent = await this.eventRepository.getEventByTitleAndOrganizer(createEventDTO.title, origanizer)
-
+        console.log(userEvent);
+        
         if (userEvent) throw new HttpException('Please choose a unique Title', HttpStatus.UNAUTHORIZED);
         const eventToCreate = {
             ...createEventDTO,

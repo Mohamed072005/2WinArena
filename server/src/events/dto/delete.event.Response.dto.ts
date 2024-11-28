@@ -1,4 +1,4 @@
-export class DeleteEventResponseDTO {
+export interface DeleteEventResponseDTO {
     statusCode: number
     message: string
 }

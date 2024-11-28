@@ -7,4 +7,5 @@ export interface EventRepositoryInterface {
     createEvent(createEventDTO: Partial<CreateEventDTO>): Promise<Event>
     getEventByIdAndOerganizer(eventId: Types.ObjectId,  organizer: Types.ObjectId): Promise<EventDocument>
     deleteEvent(event: Event): Promise<boolean>;
+    getEvents(organizer: Types.ObjectId): Promise<EventDocument[]>
 }

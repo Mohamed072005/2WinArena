@@ -1,6 +1,6 @@
 import { EventDocument } from "../event.schema"
 
-export class UpdateEventResponseDTO {
+export interface UpdateEventResponseDTO {
     statusCode: number
     event: EventDocument
     message: string

@@ -10,7 +10,8 @@ export class EventRepository implements EventRepositoryInterface {
     constructor(@InjectModel(Event.name) private readonly eventModel: Model<Event>) {}
 
     async getEventByTitleAndOrganizer(eventName: string, organizer: Types.ObjectId): Promise<EventDocument> {
-        return await this.eventModel.findOne({ title: eventName, organizer_id: organizer });
+        const organizerID = new mongoose.Types.ObjectId(organizer)
+        return await this.eventModel.findOne({ title: eventName, organizer_id: organizerID });
     }
 
     async createEvent(createEventDTO: Partial<CreateEventDTO>): Promise<Event> {
@@ -35,5 +36,10 @@ export class EventRepository implements EventRepositoryInterface {
         }catch(err: any){
             throw err;
         }
+    }
+
+    async getEvents(organizer: Types.ObjectId): Promise<EventDocument[]> {
+        const organizerID = new mongoose.Types.ObjectId(organizer);
+        return await this.eventModel.find({ organizer_id: organizerID });
     }
 }
