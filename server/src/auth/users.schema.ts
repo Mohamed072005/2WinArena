@@ -5,10 +5,10 @@ export type UsersDocument = HydratedDocument<Users>
 
 @Schema({ timestamps: true })
 export class Users {
-    @Prop({ required: true })
+    @Prop({ required: true, index: true })
     full_name: string
 
-    @Prop({ required: true, unique: true })
+    @Prop({ required: true, unique: true, index: true })
     email: string
 
     @Prop({ required: true })

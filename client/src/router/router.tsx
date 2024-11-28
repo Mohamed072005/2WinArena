@@ -4,11 +4,23 @@ import GuestLayout from "@/layout/GuestLayout";
 import LoginPage from "@/pages/auth/LoginPage";
 import RegisterPage from "@/pages/auth/RegisterPage";
 import NotFound from "@/pages/NotFound";
+import Dashboard from "@/pages/app/Dadhboard";
+import Events from "@/pages/app/Events";
 
 export const router = createBrowserRouter([
     {
         path: '/',
         element: <MainLayout />,
+        children: [
+            {
+                path: '/',
+                element: <Dashboard />
+            },
+            {
+                path: '/event',
+                element: <Events />
+            }
+        ]
     },
     {
         path: '/auth',

@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv'
 import { MongooseModule } from '@nestjs/mongoose';
 import { UtilityService } from './helpers/utility/utility.service';
 import { GlobalModule } from './global/global.module';
+import { EventsModule } from './events/events.module';
 
 dotenv.config()
 
@@ -11,7 +12,8 @@ dotenv.config()
   imports: [
     MongooseModule.forRoot(process.env.DB_URL),
     AuthModule,
-    GlobalModule
+    GlobalModule,
+    EventsModule
   ],
   providers: [UtilityService],
 })

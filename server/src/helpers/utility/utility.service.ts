@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as bcryptjs from 'bcryptjs'
 import * as jwt from 'jsonwebtoken'
 import * as dotenv from 'dotenv'
@@ -30,6 +30,15 @@ export class UtilityService {
             return { token };
         } catch (err: any) {
             throw new Error(`Failed to generate JWT: ${err.message}`);
+        }
+    }
+
+    async verifyJWTToken(token: string) {
+        try{
+            const decode = jwt.verify(token, process.env.SECRET_KEY as string); 
+            return decode;
+        }catch(err: any){
+            throw new HttpException("Can't decode the token", HttpStatus.BAD_GATEWAY);
         }
     }
 }
