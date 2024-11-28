@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, Inject, Param, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CreateEventDTO } from './dto/create.event.dto';
 import { CreateEventResponseDTO } from './dto/create.event.response.dto';
-import { AuthGuard } from 'src/common/guards/auth.guard';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
-import { UserRequestType } from 'src/common/types/user.request.type';
+import { AuthGuard } from '../common/guards/auth.guard';
+import { GetUser } from '../common/decorators/get-user.decorator';
+import { UserRequestType } from '../common/types/user.request.type';
 import { EventServiceInterface } from './interfaces/event.service.interface';
 import { UpdateEventDTO } from './dto/update.event.dto';
 import { EventParamDTO } from './dto/event.param.dto';

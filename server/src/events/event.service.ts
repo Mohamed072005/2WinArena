@@ -12,9 +12,7 @@ export class EventService implements EventServiceInterface {
     constructor(@Inject('EventRepositoryInterface') private readonly eventRepository: EventRepositoryInterface) { }
 
     async createEvent(createEventDTO: CreateEventDTO, origanizer: Types.ObjectId): Promise<Event> {
-        const userEvent = await this.eventRepository.getEventByTitleAndOrganizer(createEventDTO.title, origanizer)
-        console.log(userEvent);
-        
+        const userEvent = await this.eventRepository.getEventByTitleAndOrganizer(createEventDTO.title, origanizer)        
         if (userEvent) throw new HttpException('Please choose a unique Title', HttpStatus.UNAUTHORIZED);
         const eventToCreate = {
             ...createEventDTO,
@@ -43,7 +41,7 @@ export class EventService implements EventServiceInterface {
     async handelDeleteEvent(organizer: Types.ObjectId, eventId: Types.ObjectId): Promise<{ message: string; }> {
         const event = await this.eventRepository.getEventByIdAndOerganizer(eventId, organizer)
         if(!event) throw new HttpException('Event not found', HttpStatus.NOT_FOUND);
-        const deleteEvent = this.eventRepository.deleteEvent(event as Event);
+        const deleteEvent = await this.eventRepository.deleteEvent(event as Event);
         if(!deleteEvent) throw new HttpException('Failed to delete this event', HttpStatus.BAD_REQUEST);
         return {
             message: 'Event deleted successfully'
