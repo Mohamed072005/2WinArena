@@ -21,6 +21,9 @@ import { EventService } from './event.service';
             provide: 'EventServiceInterface',
             useClass: EventService
         }
+    ],
+    exports: [
+        'EventRepositoryInterface'
     ]
 })
 export class EventsModule {}

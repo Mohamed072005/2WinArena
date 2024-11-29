@@ -6,6 +6,7 @@ import RegisterPage from "@/pages/auth/RegisterPage";
 import NotFound from "@/pages/NotFound";
 import Dashboard from "@/pages/app/Dadhboard";
 import Events from "@/pages/app/Events";
+import Participant from "@/pages/app/Partisipants";
 
 export const router = createBrowserRouter([
     {
@@ -19,6 +20,10 @@ export const router = createBrowserRouter([
             {
                 path: '/event',
                 element: <Events />
+            },
+            {
+                path: '/registrations',
+                element: <Participant />
             }
         ]
     },
