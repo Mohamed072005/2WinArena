@@ -21,8 +21,10 @@ export class RegistrationService implements RegistrationServiceInterface {
         const registrationPayload = {
             ...createRegistrationDTO,
             event_id: new Types.ObjectId(createRegistrationDTO.event_id)
-        }        
+        }    
+        
         const createdRegistration = await this.registrationRepository.createRegistration(registrationPayload);
+        console.log(createdRegistration);
         if(!createdRegistration) throw new HttpException("Can't create this registration", HttpStatus.CONFLICT);
         return { 
             message: 'Registration created successfully',

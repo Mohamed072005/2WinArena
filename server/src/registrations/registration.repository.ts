@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { RegistrationRepositoryInterface } from "./interfaces/registration.repository.interface";
 import mongoose, { Model, Types } from "mongoose";
 import { CreateRegistrationDTO } from "./dto/create.registration.dto";
@@ -16,10 +16,12 @@ export class RegistrationRepository implements RegistrationRepositoryInterface {
 
     async createRegistration(createRegistrationDTO: Partial<CreateRegistrationDTO>): Promise<Registration> {
         try {
+            console.log(createRegistrationDTO);
+            
             const registration = new this.registrationModel(createRegistrationDTO);
             return await registration.save();
         } catch (err: any) {
-            throw err;
+            throw new HttpException(err.message, HttpStatus.CONFLICT);
         }
     }
 
@@ -49,7 +51,8 @@ export class RegistrationRepository implements RegistrationRepositoryInterface {
                     email: 1,
                     status: 1,
                     event_title: '$event.title',
-                    event_date: '$event.date'
+                    event_date: '$event.date',
+                    event_location: '$event.location'
                 }
             }
         ])

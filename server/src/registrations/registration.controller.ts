@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Inject, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, HttpStatus, Inject, Post, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { CreateRegistrationDTO } from "./dto/create.registration.dto";
 import { GetUser } from "../common/decorators/get-user.decorator";
 import { UserRequestType } from "../common/types/user.request.type";
@@ -44,6 +44,7 @@ export class RegistrationController {
 
 
     @Post('/create')
+    @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
     async createRegistration(
         @Body() createRegistrationDTO: CreateRegistrationDTO,
         @GetUser() user: UserRequestType

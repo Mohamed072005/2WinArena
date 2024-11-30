@@ -1,4 +1,4 @@
-import { IsEmpty, IsMongoId, IsNotEmpty, IsString } from "class-validator";
+import { IsEmail, IsEmpty, IsMongoId, IsNotEmpty, IsString } from "class-validator";
 import { Types } from "mongoose";
 
 export class CreateRegistrationDTO {
@@ -8,7 +8,7 @@ export class CreateRegistrationDTO {
     full_name: string
 
     @IsNotEmpty()
-    @IsEmpty()
+    @IsEmail()
     email: string
 
     @IsNotEmpty()

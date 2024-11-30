@@ -9,7 +9,7 @@ export class Registration {
     @Prop({ required: true })
     full_name: string
 
-    @Prop({ required: true, unique: true })
+    @Prop({ required: true })
     email: string
 
     @Prop({ type: Types.ObjectId, ref:'Events', required: true })
