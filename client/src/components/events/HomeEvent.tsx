@@ -101,7 +101,6 @@ const HomeEvent: React.FC = () => {
             toast.success('Event updated successfully!');
             setEditingModal(null);
         } catch (err: any) {
-            console.error('Error updating event:', err);
             toast.error(err.message || 'Failed to update event');
         }
     };
@@ -111,7 +110,21 @@ const HomeEvent: React.FC = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        if (error) toast.error(error);
+        if (error) {
+            let errorMessage = 'An unexpected error occurred';
+            if (typeof error === 'string') {
+                errorMessage = error;
+            } else if (typeof error === 'object') {
+                if (Array.isArray(error.message) && error.message.length > 0) {
+                    errorMessage = error.message[0];
+                } else if (typeof error.message === 'string') {
+                    errorMessage = error.message; 
+                } else {
+                    errorMessage = JSON.stringify(error);
+                }
+            }
+            toast.error(errorMessage);
+        }
     }, [error]);
 
     return (
