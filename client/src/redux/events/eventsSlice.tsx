@@ -94,7 +94,7 @@ const eventsSlice = createSlice({
             })
             .addCase(updateEvent.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload as string;
+                state.error = action.payload as string || 'An unknown error occurred';
             })
             .addCase(deleteEvent.pending, (state) => {
                 state.loading = true;
