@@ -1,8 +1,10 @@
-import { MapPin, MoreVertical, Users } from "lucide-react";
+import { Download, MapPin, MoreVertical } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
-import { Calendar } from "../ui/calendar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
 
 interface Registration {
     _id: string
@@ -19,9 +21,58 @@ interface RgistrationListProps {
 }
 
 const RegistrationsList: React.FC<RgistrationListProps> = ({ registrations }) => {
+
+    const downloadPDF = () => {
+        // Create a new jsPDF instance
+        const doc = new jsPDF();
+
+        // Set the document title
+        doc.text("Event Registrations", 14, 15);
+
+        // Prepare table data
+        const tableData = registrations.map(event => [
+            event.full_name,
+            event.email,
+            event.event_title,
+            new Date(event.event_date).toISOString().split('T')[0],
+            event.event_location,
+            event.status
+        ]);
+
+        // Configure the auto table
+        (doc as any).autoTable({
+            startY: 25,
+            head: [['Name', 'Email', 'Event', 'Date', 'Location', 'Status']],
+            body: tableData,
+            theme: 'striped',
+            styles: {
+                fontSize: 9,
+                cellPadding: 3,
+            },
+            columnStyles: {
+                0: { cellWidth: 30 },
+                1: { cellWidth: 40 },
+                2: { cellWidth: 30 },
+                3: { cellWidth: 30 },
+                4: { cellWidth: 30 },
+                5: { cellWidth: 20 }
+            }
+        });
+        doc.save(`event_registrations_${new Date().toISOString().split('T')[0]}.pdf`);
+    };
     return (
         <>
             <div className="bg-white shadow-md rounded-lg overflow-hidden">
+                <div className="flex justify-end p-2">
+                    <Button
+                        variant="outline"
+                        onClick={downloadPDF}
+                        className="flex items-center gap-2"
+                    >
+                        <Download className="h-4 w-4" />
+                        Download PDF
+                    </Button>
+                </div>
                 <Table>
                     <TableHeader>
                         <TableRow>

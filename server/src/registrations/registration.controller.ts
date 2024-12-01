@@ -7,9 +7,12 @@ import { CreateRegistrationResponseDTO } from "./dto/create.registration.respons
 import { RegistrationServiceInterface } from "./interfaces/registration.service.interface";
 import { RegistrationRepositoryInterface } from "./interfaces/registration.repository.interface";
 import { GetRegistrationsResponseDTO } from "./dto/get.registrations.response.dto";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Registrations')
 @Controller('registrations')
 @UseGuards(AuthGuard)
+@ApiBearerAuth('JWT-auth')
 export class RegistrationController {
     constructor(
         @Inject('RegistrationServiceInterface') private readonly registrationService: RegistrationServiceInterface,
@@ -17,6 +20,20 @@ export class RegistrationController {
     ) { }
 
     @Get('/get/registrations')
+    @ApiOperation({ summary: 'Get organizer event registrations' })
+    @ApiResponse({ 
+        status: 202, 
+        description: 'Successfully retrieved registrations',
+        type: GetRegistrationsResponseDTO
+    })
+    @ApiResponse({ 
+        status: 401, 
+        description: 'Unauthorized' 
+    })
+    @ApiResponse({ 
+        status: 500, 
+        description: 'Internal server error' 
+    })
     async getOrganizerEventsRegistrations(
         @GetUser() user: UserRequestType
     ): Promise<GetRegistrationsResponseDTO> {
@@ -44,6 +61,24 @@ export class RegistrationController {
 
 
     @Post('/create')
+    @ApiOperation({ summary: 'Create a new registration' })
+    @ApiBody({ 
+        type: CreateRegistrationDTO,
+        description: 'Registration details' 
+    })
+    @ApiResponse({ 
+        status: 201, 
+        description: 'Registration created successfully',
+        type: CreateRegistrationResponseDTO 
+    })
+    @ApiResponse({ 
+        status: 401, 
+        description: 'Unauthorized' 
+    })
+    @ApiResponse({ 
+        status: 500, 
+        description: 'Internal server error' 
+    })
     @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
     async createRegistration(
         @Body() createRegistrationDTO: CreateRegistrationDTO,
