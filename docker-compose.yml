@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    volumes:
+      - ./server:/usr/src/app
+      - server_node_modules:/usr/src/app/node_modules
+    ports:
+      - "4000:4000"
+    environment:
+      DB_URL: mongodb://mongodb:27017/2winarena
+      SECRET_KEY: ${SECRET_KEY}
+    depends_on:
+      - mongodb
+    command: npm run start:dev
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    volumes:
+      - ./client:/usr/src/app
+      - client_node_modules:/usr/src/app/node_modules
+    ports:
+      - "5175:5173"
+    environment:
+      VITE_API_URL: http://server:4000
+    depends_on:
+      - server
+    command: npm run dev
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data: {}
+  server_node_modules: {}
+  client_node_modules: {}
