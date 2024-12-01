@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UtilityService } from './helpers/utility/utility.service';
 import { GlobalModule } from './global/global.module';
 import { EventsModule } from './events/events.module';
+import { RegistrationsModule } from './registrations/registrations.module';
 
 dotenv.config()
 
@@ -13,7 +14,8 @@ dotenv.config()
     MongooseModule.forRoot(process.env.DB_URL),
     AuthModule,
     GlobalModule,
-    EventsModule
+    EventsModule,
+    RegistrationsModule
   ],
   providers: [UtilityService],
 })

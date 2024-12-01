@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import EventsLists from './EventsLists';
-import axiosClient from '@/api/axiosClient';
+import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import CreateEventModal from './CreateEventModal';
 import DeleteEventModal from './DeleteEventModal';
 import UpdateEventModal from './UpdateEventModal';
+import EventsLists from './EventsLists';
+import { fetchEvents, deleteEvent, updateEvent } from '@/redux/events/eventsSlice';
+import axiosClient from '@/api/axiosClient';
 
 interface Event {
     _id: string;
@@ -22,33 +24,16 @@ interface FormData {
     location: string;
 }
 
-interface FormErrors {
-    title?: string;
-    description?: string;
-    date?: string;
-    location?: string;
-}
-
 const HomeEvent: React.FC = () => {
-    const [events, setEvents] = useState<Event[]>([]);
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [deleteModal, setDeleteModal] = useState<string | null>(null);
-    const [editingModal, setEditingModal] = useState<Event | null>(null)
+    const [editingModal, setEditingModal] = useState<Event | null>(null);
 
-    // Fetch events from the API
-    const getEvents = async () => {
-        try {
-            const response = await axiosClient.get('/events/get/events');
-            if (response.data.statusCode === 202) {
-                setEvents(response.data.events);
-            }
-        } catch (err: any) {
-            toast.error(err.response?.data?.message?.message || 'Failed to fetch events');
-        }
-    };
+    const dispatch = useDispatch();
+    const { events, loading, error } = useSelector((state: any) => state.events);
 
-    const validateFormInputs = (payload: FormData): FormErrors => {
-        const errors: FormErrors = {};
+    const validateFormInputs = (payload: FormData): Record<string, string> => {
+        const errors: Record<string, string> = {};
         if (!payload.title.trim()) errors.title = 'Title is required';
         if (!payload.description.trim()) errors.description = 'Description is required';
         if (!payload.location.trim()) errors.location = 'Location is required';
@@ -74,37 +59,28 @@ const HomeEvent: React.FC = () => {
 
         try {
             const response = await axiosClient.post('/events/create', payload);
-            if (response.data.statusCode === 201) {
-                toast.success('Event created successfully!');
-                getEvents();
-                setSelectedDate(null);
-                return true
-            }
+            toast.success('Event created successfully!');
+            dispatch(fetchEvents());
+            return true
         } catch (err: any) {
-            console.log(err);
-            toast.error(err.response.data.message.error);
-            return false
+            console.error('Error creating event:', err);
+            toast.error(err.response?.data?.message || 'Failed to create event');
         }
     };
 
-    const handelDeleteEvent = async (eventId: string) => {
-        if (!eventId || eventId === '') {
-            toast.error('No provided more info to delete this event');
-            setDeleteModal(null)
-        }
+    const handleDeleteEvent = async (eventId: string) => {
         try {
-            const response = await axiosClient.delete(`/events/delete/${eventId}`);
-            if (response.data.statusCode === 202) {
-                setEvents(events.filter((event) => event._id !== eventId));
-                toast.success(response.data.message);
-                setDeleteModal(null);
-            }
+            await dispatch(deleteEvent(eventId)).unwrap();
+            toast.success('Event deleted successfully!');
         } catch (err: any) {
-            console.log(err);
+            console.error('Error deleting event:', err);
+            toast.error(err.message || 'Failed to delete event');
+        } finally {
+            setDeleteModal(null);
         }
-    }
+    };
 
-    const handelUpdateModal = async (e: React.FormEvent<HTMLFormElement>, eventId: string) => {
+    const handleUpdateEvent = async (e: React.FormEvent<HTMLFormElement>, eventId: string) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const payload: FormData = {
@@ -112,34 +88,31 @@ const HomeEvent: React.FC = () => {
             description: formData.get('description') as string,
             location: formData.get('location') as string,
             date: formData.get('date') as string,
-        };        
+        };
+
         const errors = validateFormInputs(payload);
         if (Object.keys(errors).length > 0) {
             toast.error('Please fix validation errors before submitting.');
             return;
         }
-        try{
-            const response = await axiosClient.put(`/events/update/${eventId}`, payload);
-            console.log(response);
-            if(response.data.statusCode === 201){
-                toast.success(response.data.message);
-                setEditingModal(null);
-                getEvents();
-            }
-        }catch(err: any){
-            if(Array.isArray(err.response.data.message.message)){
-                toast.error(err.response.data.message.message[0]);
-            }else if(!Array.isArray(err.response.data.message.message)){
-                toast.error(err.response.data.message.message);
-            }else{
-                toast.error('Server error')
-            }
+
+        try {
+            await dispatch(updateEvent({ eventId, eventData: payload })).unwrap();
+            toast.success('Event updated successfully!');
+            setEditingModal(null);
+        } catch (err: any) {
+            console.error('Error updating event:', err);
+            toast.error(err.message || 'Failed to update event');
         }
-    }
+    };
 
     useEffect(() => {
-        getEvents();
-    }, []);
+        dispatch(fetchEvents());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (error) toast.error(error);
+    }, [error]);
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -150,27 +123,30 @@ const HomeEvent: React.FC = () => {
                     selectedDate={selectedDate}
                     setSelectedDate={setSelectedDate}
                 />
-
             </div>
-            <EventsLists
-                events={events}
-                setDeleteModal={setDeleteModal}
-                setEditingModal={setEditingModal}
-            />
-            {deleteModal &&
+            {loading ? (
+                <p>Loading...</p>
+            ) : (
+                <EventsLists
+                    events={events}
+                    setDeleteModal={setDeleteModal}
+                    setEditingModal={setEditingModal}
+                />
+            )}
+            {deleteModal && (
                 <DeleteEventModal
                     eventId={deleteModal}
                     closeDeleteModal={() => setDeleteModal(null)}
-                    handelDeleteEvent={handelDeleteEvent}
+                    handelDeleteEvent={handleDeleteEvent}
                 />
-            }
-            {editingModal &&
+            )}
+            {editingModal && (
                 <UpdateEventModal
                     event={editingModal}
                     setEditingModal={setEditingModal}
-                    handleUpdateEvent={handelUpdateModal}
+                    handleUpdateEvent={handleUpdateEvent}
                 />
-            }
+            )}
         </div>
     );
 };
