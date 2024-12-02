@@ -1,3 +1,4 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer"
 import { IsDate, IsNotEmpty, IsString, Validate, ValidationArguments, ValidatorConstraint, ValidatorConstraintInterface } from "class-validator"
 
@@ -13,18 +14,34 @@ export class IsFutureDate implements ValidatorConstraintInterface {
 }
 
 export class UpdateEventDTO {
+    @ApiProperty({
+        description: 'Event Title',
+        example: 'Classico'
+    })
     @IsString()
     @IsNotEmpty()
     title: string
 
+    @ApiProperty({
+        description: 'Event Description',
+        example: 'Leo fl Bernabeu'
+    })
     @IsString()
     @IsNotEmpty()
     description: string
 
+    @ApiProperty({
+        description: 'Event Location',
+        example: 'Madrid'
+    })
     @IsString()
     @IsNotEmpty()
     location: string
 
+    @ApiProperty({
+        description: 'Event Date',
+        example: '2017-4-24'
+    })
     @IsNotEmpty()
     @IsDate()
     @Type(() => Date)

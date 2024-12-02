@@ -26,14 +26,6 @@ export class RegistrationController {
         description: 'Successfully retrieved registrations',
         type: GetRegistrationsResponseDTO
     })
-    @ApiResponse({ 
-        status: 401, 
-        description: 'Unauthorized' 
-    })
-    @ApiResponse({ 
-        status: 500, 
-        description: 'Internal server error' 
-    })
     async getOrganizerEventsRegistrations(
         @GetUser() user: UserRequestType
     ): Promise<GetRegistrationsResponseDTO> {
