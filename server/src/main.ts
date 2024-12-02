@@ -14,7 +14,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('API Documentation for 2WinArena')
-    .setDescription('This API Documentation created to show the how to communicate with the app')
+    .setDescription('This API Documentation created to show how to communicate with the app')
     .setVersion('1.0')
     .build();
 

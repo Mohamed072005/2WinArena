@@ -12,9 +12,12 @@ import { EventDocument } from './event.schema';
 import { DeleteEventResponseDTO } from './dto/delete.event.Response.dto';
 import { EventRepositoryInterface } from './interfaces/event.repository.interface';
 import { GetEventsResponseDTO } from './dto/get.event.response.dto';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Events')
 @Controller('events')
 @UseGuards(AuthGuard)
+@ApiBearerAuth('JWT-auth')
 export class EventController {
 
     constructor(
@@ -23,6 +26,21 @@ export class EventController {
     ) { }
 
     @Get('/get/events')
+    @ApiOperation({ summary: 'Get events for the current organizer' })
+    @ApiResponse({ 
+        status: 202, 
+        description: 'Successfully retrieved events',
+        type: GetEventsResponseDTO 
+    })
+    @ApiResponse({ 
+        status: 401, 
+        description: 'Unauthorized' ,
+        example: "Token not provided"
+    })
+    @ApiResponse({ 
+        status: 500, 
+        description: 'Internal server error' 
+    })
     async getOrganizerEvents(@GetUser() user: UserRequestType): Promise<GetEventsResponseDTO> {
         try {
             return {
@@ -45,7 +63,33 @@ export class EventController {
         }
     }
 
+
+
     @Post('/create')
+    @ApiOperation({ summary: 'Create Evemt' })
+    @ApiBody({ 
+        type: CreateEventDTO,
+        description: 'Event creation details',
+    })
+    @ApiResponse({ 
+        status: 201, 
+        description: 'Successfully create event',
+        type: CreateEventResponseDTO 
+    })
+    @ApiResponse({ 
+        status: 401, 
+        description: 'Unauthorized' ,
+        example: "Token not provided"
+    })
+    @ApiResponse({ 
+        status: 400, 
+        description: 'Bad Request', 
+        example: 'Failed to create the event'
+    })
+    @ApiResponse({ 
+        status: 500, 
+        description: 'Internal server error' 
+    })
     @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
     async createEvent(@Body() createEventDTO: CreateEventDTO, @GetUser() user: UserRequestType): Promise<CreateEventResponseDTO> {
         try {
@@ -71,7 +115,39 @@ export class EventController {
         }
     }
 
+
+
+
     @Put('update/:eventId')
+    @ApiOperation({ summary: 'Update an existing event' })
+    @ApiParam({ 
+        name: 'eventId', 
+        description: 'ID of the event to update',
+        example: '60d5ecb54b5f1a2f4c9e89a1' 
+    })
+    @ApiBody({ 
+        type: UpdateEventDTO,
+        description: 'Event update details' 
+    })
+    @ApiResponse({ 
+        status: 201, 
+        description: 'Event updated successfully',
+        type: UpdateEventResponseDTO 
+    })
+    @ApiResponse({ 
+        status: 401, 
+        description: 'Unauthorized' ,
+        example: "Token not provided"
+    })
+    @ApiResponse({ 
+        status: 404, 
+        description: 'Not Found',
+        example: 'Event not found' 
+    })
+    @ApiResponse({ 
+        status: 500, 
+        description: 'Internal server error' 
+    })
     @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
     async updateEvent(
         @Body() updateEventDTO: UpdateEventDTO,
@@ -99,7 +175,39 @@ export class EventController {
         }
     }
 
+
+
     @Delete('delete/:eventId')
+    @ApiOperation({ summary: 'Delete an existing event' })
+    @ApiParam({ 
+        name: 'eventId', 
+        description: 'ID of the event to delete',
+        example: '60d5ecb54b5f1a2f4c9e89a1' 
+    })
+    @ApiResponse({ 
+        status: 202, 
+        description: 'Event deleted successfully',
+        type: DeleteEventResponseDTO 
+    })
+    @ApiResponse({ 
+        status: 401, 
+        description: 'Unauthorized', 
+        example: "Token not provided"
+    })
+    @ApiResponse({ 
+        status: 404, 
+        description: 'Bad Request' ,
+        example: 'Event not found'
+    })
+    @ApiResponse({ 
+        status: 400, 
+        description: 'Bad Request' ,
+        example: 'Failed to delete this event'
+    })
+    @ApiResponse({ 
+        status: 500, 
+        description: 'Internal server error' 
+    })
     @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
     async deleteEvent(
         @Param() param: EventParamDTO,
